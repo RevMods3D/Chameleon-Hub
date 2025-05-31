@@ -6,8 +6,8 @@
 
 ## ✨ Features
 - Load and browse `.bndl` and `.dat` files directly from the game directory
-- View content of said archives by name or ASCII content
-- Spoof names on files for easier search and movement in the program
+- View/search content of said archives by name or ASCII content (WIP)
+- Spoof names on files for easier search and movement in the program (Planned)
 - Texture, model and sound extraction (Planned)
 
 ## 🛠 Getting Started
