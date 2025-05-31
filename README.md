@@ -2,7 +2,7 @@
 
 **Chameleon hub** is a modding tool intended for **Chameleon engine game** modding designed to provide editing and inspecting capabilities for the game files. It allows modders to explore, extract and override files, models, textures and configuration data without the need to manually extract the archives.
 
-![screenshot](https://github.com/Adam5hea/Chameleon-Hub/assets/preview-image.png)
+![Chameleon Hub](./chameleon-hub-banner.svg)
 
 ## ✨ Features
 - Load and browse `.bndl` and `.dat` files directly from the game directory
