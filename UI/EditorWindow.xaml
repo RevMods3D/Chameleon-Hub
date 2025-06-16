@@ -41,21 +41,19 @@
             </Border>
 
             <!-- Main Content -->
-            <Grid Margin="70,30,10,10">
+            <Grid Margin="70,30,10,10" HorizontalAlignment="Left" Width="948" VerticalAlignment="Center">
                 <!-- Add left margin to avoid overlap with vertical bar -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="261*" />
-                    <ColumnDefinition Width="305*" />
-                    <ColumnDefinition Width="87*"/>
-                    <ColumnDefinition Width="327*" />
+                    <ColumnDefinition Width="95*" />
+                    <ColumnDefinition Width="221*" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Left Panel: BNDL Files -->
-                <Border Background="#7F000000" Margin="5,5,5,5" Grid.Column="0" CornerRadius="10" Padding="10" >
+                <Border Background="#7F000000" Margin="0,5,0,5" CornerRadius="10" Padding="10" Width="274" HorizontalAlignment="Left" >
                     <StackPanel>
                         <TextBlock Text="Files" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
 
-                        <DockPanel Margin="0,0,0,10">
+                        <DockPanel Margin="0,0,0,10" HorizontalAlignment="Left">
                             <TextBox x:Name="SearchBox"
              Width="180"
              Height="25"
@@ -73,16 +71,16 @@
             Cursor="Hand" Background="#3F888888" BorderBrush="Black"/>
                         </DockPanel>
 
-                        <TreeView x:Name="treeBndlFiles" Background="Transparent" Foreground="White" SelectedItemChanged="TreeBndlFiles_SelectedItemChanged"/>
+                        <TreeView x:Name="treeBndlFiles" Background="Transparent" Foreground="White" SelectedItemChanged="TreeBndlFiles_SelectedItemChanged" Height="500"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Center Panel: Selected BNDL Info -->
-                <Border Background="#7F000000" Margin="5,5,5,5" Grid.Column="1" CornerRadius="10" Padding="10" Grid.ColumnSpan="2" >
+                <Border Background="#7F000000" Margin="10,5,0,5" Grid.Column="1" CornerRadius="10" Padding="10" HorizontalAlignment="Left" VerticalAlignment="Center" Width="615" >
                     <StackPanel>
                         <TextBlock x:Name="textBndlDatContent" Text="BNDL/DAT File Content" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
 
-                        <DockPanel Margin="0,0,0,10">
+                        <DockPanel Margin="0,0,0,10" HorizontalAlignment="Left">
                             <TextBox x:Name="HexSearchBox"
                      Width="300"
                      Height="25"
@@ -115,25 +113,20 @@
                         </ScrollViewer>
                     </StackPanel>
                 </Border>
+                <TextBlock x:Name="AlignmentInfoTextBlock"
+                            FontSize="14"
+                            Foreground="LightGreen"
+                            Text="Alignment info will appear here." RenderTransformOrigin="0.5,0.5" Margin="115,280,115,280" >
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0" Y="-300"/>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
 
-                <!-- Right Panel: DAT Contents -->
-                <Border Background="#7F000000" Margin="5,5,5,5" Grid.Column="3" CornerRadius="10" Padding="10" >
-                    <StackPanel>
-                        <TextBlock Text="Hex Code" Foreground="White" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <ScrollViewer Height="490" Width="270" Margin="0,50,0,0">
-                            <TextBox x:Name="textBoxHex"
-                     Background="#7FFFFFFF"
-                     Foreground="Black"
-                     FontFamily="Consolas"
-                     FontSize="12"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto"
-                     HorizontalScrollBarVisibility="Auto"
-                     IsReadOnly="True"
-                     BorderThickness="0"/>
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
             </Grid>
         </Grid>
     </Border>
