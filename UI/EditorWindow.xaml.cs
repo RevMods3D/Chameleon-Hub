@@ -166,7 +166,7 @@ namespace Chameleon_Hub
         {
             var bndl = new NFSMWBNDL(filePath);
 
-            foreach (var entry in bndl.Entries) //The printer couldn't print hehehe.
+            foreach (var entry in bndl.Entries)
             {
                 var entryNode = new TreeViewItem
                 {
@@ -380,7 +380,7 @@ namespace Chameleon_Hub
                     AlignmentInfoTextBlock.Text = $"Inline data size: {data.Length} bytes";
                 }
 
-                if (fileData != null) //owo
+                if (fileData != null)
                 {
                     Data = fileData;
 
