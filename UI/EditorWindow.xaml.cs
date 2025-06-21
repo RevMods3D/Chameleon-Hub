@@ -1,18 +1,11 @@
-﻿using Chameleon_Hub.Core;
-using ChameleonHub.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
-using WpfHexaEditor;
-using static Chameleon_Hub.NFSMWBNDL;
 
 namespace Chameleon_Hub
 {
@@ -27,6 +20,14 @@ namespace Chameleon_Hub
             treeBndlFiles.SelectedItemChanged += TreeBndlFiles_SelectedItemChanged;
         }
 
+        private void LoadHexBytes(byte[] data)
+        {
+            if (FileTabControl.SelectedItem is TabItem tab &&
+                tab.Content is WpfHexaEditor.HexEditor editor)
+            {
+                editor.Stream = new MemoryStream(data);
+            }
+        }
 
         /////////////////////////Buttons//////////////////////////////
         private void DragWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -74,6 +75,27 @@ namespace Chameleon_Hub
                 }
             }
         }
+        private void HexSearchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                PerformHexSearch();
+            }
+        }
+
+        private void HexSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            PerformHexSearch();
+        }
+
+        private void PerformHexSearch()
+        {
+            string searchText = HexSearchBox.Text;
+            if (string.IsNullOrWhiteSpace(searchText)) return;
+
+            // Add your hex search logic here if supported by the control.
+            MessageBox.Show($"Searching for: {searchText}");
+        }
         ///////////////////////////////////////////////////////
 
         private void EditorWindow_Loaded(object sender, RoutedEventArgs e)
@@ -86,19 +108,18 @@ namespace Chameleon_Hub
 
             treeBndlFiles.Items.Clear();
 
-            var rootNode = new TreeViewItem
+            // Directly load the contents into the root of the tree
+            foreach (var dir in Directory.GetDirectories(gamePath))
             {
-                Header = System.IO.Path.GetFileName(gamePath.TrimEnd('\\', '/')),
-                Foreground = Brushes.White,
-                IsExpanded = true
-            };
-
-            LoadFolderToTree(rootNode, gamePath);
-
-            treeBndlFiles.Items.Add(rootNode);
+                LoadTreeNode(treeBndlFiles, dir, Path.GetFileName(dir));
+            }
+            foreach (var file in Directory.GetFiles(gamePath, "*.bndl"))
+            {
+                LoadTreeNode(treeBndlFiles, file, Path.GetFileName(file));
+            }
         }
 
-        private void LoadFolderToTree(TreeViewItem parentNode, string folderPath)
+        /*private void LoadFolderToTree(TreeViewItem parentNode, string folderPath)
         {
             try
             {
@@ -141,7 +162,7 @@ namespace Chameleon_Hub
             {
                 MessageBox.Show($"Error reading folder '{folderPath}': {ex.Message}");
             }
-        }
+        }*/
 
         private void BndlNode_Expanded(object sender, RoutedEventArgs e)
         {
@@ -175,34 +196,24 @@ namespace Chameleon_Hub
                     Foreground = Brushes.White
                 };
 
-                // Get contained files from entry
                 var containedFiles = entry.GetContainedFiles();
 
-                foreach (var (name, content) in containedFiles)
+                foreach (var (fileName, content) in containedFiles)
                 {
+                    // Get base name without extension, so extensions like .dat or .bndl are hidden in UI
+                    var displayName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+
                     var childNode = new TreeViewItem
                     {
-                        Header = name,
+                        Header = displayName,
                         Tag = content,
                         Foreground = Brushes.White
                     };
 
-                    // If this contained file is itself a .dat file, parse it further
-                    if (name.EndsWith(".dat", StringComparison.OrdinalIgnoreCase))
+                    if (IsLikelyDatFile(content))
                     {
-                        var datEntries = ParseDatEntries(content);
-                        foreach (var (datName, datContent) in datEntries)
-                        {
-                            var datChildNode = new TreeViewItem
-                            {
-                                Header = datName,
-                                Tag = datContent,
-                                Foreground = Brushes.LightGray
-                            };
-                            datChildNode.Expanded += DatNode_Expanded; // <-- Needed
-                            datChildNode.Items.Add(null); // So it shows the expand arrow
-                            childNode.Items.Add(datChildNode);
-                        }
+                        childNode.Items.Add(null);
+                        childNode.Expanded += DatNode_Expanded;
                     }
 
                     entryNode.Items.Add(childNode);
@@ -216,10 +227,44 @@ namespace Chameleon_Hub
 
         public IEnumerable<(string Name, byte[] Content)> ParseDatEntries(byte[] datFileContent)
         {
-            return new List<(string, byte[])>()
+            var entries = GetDatEntries(datFileContent);
+            if (entries.Count > 1)
             {
-                ("RawData", datFileContent)
-            };
+                foreach (var entry in entries)
+                {
+                    var name = entry.ResourceId ?? $"DAT_0x{entry.Offset:X}";
+                    var content = datFileContent.Skip(entry.Offset).Take(entry.Length).ToArray();
+                    yield return (name, content);
+                }
+            }
+            else
+            {
+                yield return ("RawData", datFileContent);
+            }
+        }
+
+        private void TreeBndlFiles_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (treeBndlFiles.SelectedItem is TreeViewItem selectedItem)
+            {
+                string fileName = selectedItem.Header.ToString();
+
+                // Try to get inline data and open it
+                if (selectedItem.Tag is byte[] inlineData)
+                {
+                    AddHexEditorTab(fileName, inlineData);
+                }
+                // If it's a file on disk (like from base folder), open from path
+                else if (selectedItem.Tag is string path && File.Exists(path))
+                {
+                    // ⛔️ Skip .bndl files
+                    if (Path.GetExtension(path).Equals(".bndl", StringComparison.OrdinalIgnoreCase))
+                        return;
+
+                    byte[] fileData = File.ReadAllBytes(path);
+                    AddHexEditorTab(System.IO.Path.GetFileName(path), fileData);
+                }
+            }
         }
 
         private void DatNode_Expanded(object sender, RoutedEventArgs e)
@@ -228,37 +273,38 @@ namespace Chameleon_Hub
 
             e.Handled = true;
 
-            // Only load contents if dummy child exists
             if (node.Items.Count == 1 && node.Items[0] == null)
             {
                 node.Items.Clear();
 
                 if (node.Tag is byte[] data)
                 {
-                    // Parse .dat data and add contained files if any
-                    var datEntries = ParseDatEntries(data); // You need to implement this
+                    var datEntries = GetDatEntries(data);
 
-                    if (datEntries != null)
+                    foreach (var entry in datEntries)
                     {
-                        foreach (var (name, content) in datEntries)
+                        var name = entry.ResourceId ?? $"DAT_0x{entry.Offset:X}";
+                        var content = data.Skip(entry.Offset).Take(entry.Length).ToArray();
+
+                        var childNode = new TreeViewItem
                         {
-                            var childNode = new TreeViewItem
-                            {
-                                Header = name,
-                                Tag = content,
-                                Foreground = Brushes.White
-                            };
-                            node.Items.Add(childNode);
+                            Header = name,
+                            Tag = content,
+                            Foreground = Brushes.White
+                        };
+
+                        if (IsLikelyDatFile(content))
+                        {
+                            childNode.Items.Add(null);
+                            childNode.Expanded += DatNode_Expanded;
                         }
-                    }
-                    else
-                    {
-                        // If no further files, just keep raw data node or display hex/ascii when selected
+
+                        node.Items.Add(childNode);
                     }
                 }
             }
 
-            void ParseDatFile(byte[] datData, TreeViewItem parentItem)
+        void ParseDatFile(byte[] datData, TreeViewItem parentItem)
             {
                 List<DatEntry> entries = GetDatEntries(datData); // Your logic to extract offsets, sizes, etc.
 
@@ -360,45 +406,133 @@ namespace Chameleon_Hub
         }
         //////////////////////////////////////////////////////////////////////////////////
 
-        private async void TreeBndlFiles_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void TreeBndlFiles_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (treeBndlFiles.SelectedItem is TreeViewItem selectedItem)
             {
-                byte[] fileData = null;
+                string fileName = selectedItem.Header.ToString();
 
                 if (selectedItem.Tag is string path && File.Exists(path))
                 {
-                    // Load file on background thread
-                    fileData = await Task.Run(() => File.ReadAllBytes(path));
+                    byte[] fileData = File.ReadAllBytes(path);
 
-                    string alignmentInfo = AlignmentChecker.GetAlignmentInfo(System.IO.Path.GetFileName(path), fileData.Length);
-                    AlignmentInfoTextBlock.Text = alignmentInfo;
+                    // Create new tab
+                    AddHexEditorTab(fileName, fileData);
                 }
-                else if (selectedItem.Tag is byte[] data)
+                else if (selectedItem.Tag is byte[] inlineData)
                 {
-                    fileData = data;
-                    AlignmentInfoTextBlock.Text = $"Inline data size: {data.Length} bytes";
-                }
-
-                if (fileData != null)
-                {
-                    Data = fileData;
-
-                    // Load data into the WPFHexaEditor
-                    using (var ms = new MemoryStream(fileData))
-                    {
-                        HexEditor.Stream = ms;
-                    }
-                }
-                else
-                {
-                    // Clear HexEditor if nothing to load
-                    HexEditor.Clear();
-                    AlignmentInfoTextBlock.Text = "";
+                    AddHexEditorTab(fileName, inlineData);
                 }
             }
         }
 
+        private void AddHexEditorTab(string title, byte[] data)
+        {
+            foreach (TabItem existingTab in FileTabControl.Items)
+            {
+                if (existingTab.Header is StackPanel header &&
+                    header.Children[0] is TextBlock tb &&
+                    tb.Text == title)
+                {
+                    FileTabControl.SelectedItem = existingTab;
+                    return;
+                }
+            }
+
+            var hexEditor = new WpfHexaEditor.HexEditor
+            {
+                Stream = new MemoryStream(data),
+                ReadOnlyMode = true,
+                Background = new SolidColorBrush(Color.FromArgb(127, 255, 255, 255)),
+                Foreground = Brushes.Black,
+                Width = 590,
+                Height = 400,
+                Margin = new Thickness(5)
+            };
+
+            var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
+            var titleText = new TextBlock
+            {
+                Text = title,
+                Margin = new Thickness(0, 0, 5, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var closeBtn = new Button
+            {
+                Content = "×",
+                Width = 16,
+                Height = 16,
+                Padding = new Thickness(0),
+                Margin = new Thickness(5, 0, 0, 0),
+                Background = Brushes.Transparent,
+                BorderBrush = Brushes.Transparent,
+                Cursor = Cursors.Hand
+            };
+
+            var tabItem = new TabItem { Content = hexEditor };
+            closeBtn.Click += (s, e) => FileTabControl.Items.Remove(tabItem);
+
+            headerPanel.Children.Add(titleText);
+            headerPanel.Children.Add(closeBtn);
+            tabItem.Header = headerPanel;
+
+            FileTabControl.Items.Add(tabItem);
+            FileTabControl.SelectedItem = tabItem;
+        }
+
+        private void LoadTreeNode(ItemsControl parentNode, object tag, string displayName, byte[] data = null)
+        {
+            var node = new TreeViewItem
+            {
+                Header = displayName,
+                Tag = tag,
+                Foreground = Brushes.White
+            };
+
+            if (data != null)
+            {
+                if (IsLikelyDatFile(data))
+                {
+                    node.Items.Add(null); // Enable expand arrow
+                    node.Expanded += DatNode_Expanded;
+                }
+            }
+            else if (tag is string path)
+            {
+                if (Directory.Exists(path))
+                {
+                    // Folder: Recursively load its children
+                    foreach (var dir in Directory.GetDirectories(path))
+                    {
+                        LoadTreeNode(node, dir, Path.GetFileName(dir));
+                    }
+                    foreach (var file in Directory.GetFiles(path, "*.bndl"))
+                    {
+                        var bndlNode = new TreeViewItem
+                        {
+                            Header = Path.GetFileName(file),
+                            Tag = file,
+                            Foreground = Brushes.White
+                        };
+                        bndlNode.Items.Add(null);
+                        bndlNode.Expanded += BndlNode_Expanded;
+                        node.Items.Add(bndlNode);
+                    }
+                }
+                else if (File.Exists(path))
+                {
+                    var fileData = File.ReadAllBytes(path);
+                    if (Path.GetExtension(path).Equals(".dat", StringComparison.OrdinalIgnoreCase) && IsLikelyDatFile(fileData))
+                    {
+                        node.Items.Add(null);
+                        node.Expanded += DatNode_Expanded;
+                    }
+                }
+            }
+
+            parentNode.Items.Add(node);
+        }
         private void TreeBndlFiles_Expanded(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is TreeViewItem item)
@@ -442,28 +576,7 @@ namespace Chameleon_Hub
             }
         }
 
-        private string ConvertToAscii(byte[] data)
-        {
-            return new string(data.Select(b => (b >= 32 && b <= 126) ? (char)b : '.').ToArray());
-        }
-
-        private string ConvertToHex(byte[] data)
-        {
-            return BitConverter.ToString(data).Replace("-", " ");
-        }
-
         public byte[] Data { get; set; }  // Or however you store the raw content
-        public string ToAscii()
-        {
-            if (Data == null) return string.Empty;
-            return new string(Data.Select(b => (b >= 32 && b <= 126) ? (char)b : '.').ToArray());
-        }
-
-        public string ToHex()
-        {
-            if (Data == null) return string.Empty;
-            return BitConverter.ToString(Data).Replace("-", " ");
-        }
 
         
 
