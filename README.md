@@ -15,3 +15,7 @@
 1. Clone the repository:
    ```bash
    git clone https://github.com/Adam5hea/Chameleon-Hub.git
+
+## If you enjoy my work, consider tipping!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W21HVB2N)
