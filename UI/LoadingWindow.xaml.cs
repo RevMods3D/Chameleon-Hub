@@ -6,12 +6,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Windows.Media.Animation;
 
 namespace Chameleon_Hub
 {
     public partial class LoadingWindow : Window
     {
+        private bool toggle = true;
+        private int currentIndex = 0;
+        private readonly DispatcherTimer timer;
         private readonly GameEntry gameEntry;
+        private readonly string[] backgrounds = Enumerable.Range(0, 5)
+    .Select(i => $"pack://application:,,,/ChameleonHub;component/Resources/LoadingScreen{i}.png")
+    .ToArray();
 
         public LoadingWindow(GameEntry entry)
         {
@@ -23,7 +32,56 @@ namespace Chameleon_Hub
             {
                 await LoadGameFilesAsync(Path.GetDirectoryName(gameEntry.ExePath));
             };
+
+            // Show the first background
+            BackgroundImage1.Source = new BitmapImage(new Uri(backgrounds[currentIndex], UriKind.Absolute));
+            BackgroundImage2.Opacity = 0; // ensure the second image is hidden initially
+
+            // Rotate every x seconds
+            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+            timer.Tick += (s, e) => ChangeBackground();
+            timer.Start();
         }
+
+        ///////////////////// Visuals ///////////////////////
+        private void ChangeBackground()
+        {
+            // Next image index
+            currentIndex = (currentIndex + 1) % backgrounds.Length;
+
+            Image fadeOutImg, fadeInImg;
+
+            if (toggle)
+            {
+                fadeInImg = BackgroundImage2;
+                fadeOutImg = BackgroundImage1;
+            }
+            else
+            {
+                fadeInImg = BackgroundImage1;
+                fadeOutImg = BackgroundImage2;
+            }
+
+            // Load next image on top
+            fadeInImg.Source = new BitmapImage(new Uri(backgrounds[currentIndex], UriKind.Absolute));
+            fadeInImg.Opacity = 0;
+
+            // Fade in the new image
+            var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(2));
+            fadeIn.Completed += (s, e) =>
+            {
+                // Fade out the old image after new is fully visible
+                var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1));
+                fadeOutImg.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+            };
+
+            fadeInImg.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+
+            toggle = !toggle;
+        }
+
+        /////////////////////////////////////////////////////
+
         public void UpdateProgress(int percent)
         {
             Dispatcher.Invoke(() =>

@@ -42,7 +42,7 @@
         <!-- MAIN GRID -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="100"/>
                 <!-- Sidebar -->
                 <ColumnDefinition Width="*"/>
                 <!-- Content -->
@@ -81,11 +81,11 @@
                 </ListBox>
 
                 <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-                    <Button Width="175" Height="30" Content="Add" Click="AddGame_Click"
+                    <Button Width="75" Height="30" Content="Add" Click="AddGame_Click"
                             Background="#FF3E3E42" Foreground="White" BorderThickness="0"/>
-                    <Button Width="175" Height="30" Content="Delete" Click="DeleteGame_Click"
+                    <Button Width="75" Height="30" Content="Delete" Click="DeleteGame_Click"
                             Background="#FF3E3E42" Foreground="White" BorderThickness="0" Margin="0,5,0,5"/>
-                    <Button x:Name="OpenButton" Width="175" Height="30" Content="Open" Click="OpenButton_Click"
+                    <Button x:Name="OpenButton" Width="75" Height="30" Content="Open" Click="OpenButton_Click"
                             Background="#FF3E3E42" Foreground="White" BorderThickness="0"/>
                 </StackPanel>
             </StackPanel>

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8FDFFFEC-A493-4524-8A9F-E47D6D7ECE65}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ChameleonHubWPF</RootNamespace>
-    <AssemblyName>ChameleonHubWPF</AssemblyName>
+    <RootNamespace>ChameleonHub</RootNamespace>
+    <AssemblyName>ChameleonHub</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <LangVersion>9.0</LangVersion>
     <FileAlignment>512</FileAlignment>
@@ -46,7 +46,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Drawing.Common.9.0.5\lib\net462\System.Drawing.Common.dll</HintPath>
+      <HintPath>packages\System.Drawing.Common.9.0.6\lib\net462\System.Drawing.Common.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -144,12 +144,17 @@
     <Resource Include="Resources\Chameleon hub.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\LoadingScreen.png" />
+    <Resource Include="Resources\LoadingScreen0.png" />
     <Resource Include="Resources\NFS MW12.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Chameleon hub.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\LoadingScreen1.png" />
+    <Resource Include="Resources\LoadingScreen2.png" />
+    <Resource Include="Resources\LoadingScreen3.png" />
+    <Resource Include="Resources\LoadingScreen4.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

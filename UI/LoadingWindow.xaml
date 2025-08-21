@@ -18,9 +18,10 @@
         <Grid>
             <!-- Background image with rounded corners -->
             <Border CornerRadius="20" ClipToBounds="True">
-                <Image Source="/Resources/LoadingScreen.png"
-                       Stretch="Fill"
-                       Opacity="0.95"/>
+                <Grid>
+                    <Image x:Name="BackgroundImage1" Stretch="Fill" Opacity="1"/>
+                    <Image x:Name="BackgroundImage2" Stretch="Fill" Opacity="0"/>
+                </Grid>
             </Border>
 
             <!-- Overlay content at bottom -->
