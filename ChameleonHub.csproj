@@ -86,12 +86,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BNDL Related\BNDLEntry.cs" />
-    <Compile Include="BNDL Related\BndlFile.cs" />
     <Compile Include="Core\RelayCommand.cs" />
-    <Compile Include="BNDL Related\DatFileEntry.cs" />
-    <Compile Include="BNDL Related\DatFileReference.cs" />
-    <Compile Include="BNDL Related\EditorViewModel.cs" />
-    <Compile Include="BNDL Related\FileLoaderService.cs" />
     <Compile Include="FileNames.cs" />
     <Compile Include="GameFolder.cs" />
     <Compile Include="Helper.cs" />

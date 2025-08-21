@@ -1,0 +1,40 @@
+0x0		0x4		char[4]		macMagicNumber	Bundle magic	bnd2
+0x4		0x2		uint16_t	muVersion	Bundle version	5
+0x6		0x2		uint16_t	muPlatform	Platform the bundle is built for	See Platform
+0x8		0x4		uint32_t	muDebugDataOffset	Bundle debug data offset	ResourceStringTable XML
+0xC		0x4		uint32_t	muResourceEntriesCount	Number of resources in the bundle	
+0x10	0x4		uint32_t	muResourceEntriesOffset	Resource entries offset	
+0x14	0x10	uint32_t[4]	mauResourceDataOffset	Per-memory type resource data offsets	
+0x24	0x4		uint32_t	muFlags	Bundle flags	See eBundleFlags
+0x28	0x8		ID			mDefaultResourceId	Default resource to access	
+0x30	0x4		int32_t		miDefaultResourceStreamIndex	Stream index of the default resource	
+0x34	0x3C	char[4][15]	macStreamName	Names of the streams contained in the bundle	
+
+
+62 6E 64 32	macMagicNumber
+05 00		muVersion
+01 00		muPlatform
+2F 4F 03 00	muDebugDataOffset
+18 01 00 00	muResourceEntriesCount
+70 00 00 00	muResourceEntriesOffset
+30 4F 00 00 2F 4F 03 00 2F 4F 03 00 2F 4F 03 00	mauResourceDataOffset
+09 00 00 00	muFlags
+00 00 00 00 00 00 00 00	mDefaultResourceId
+FF FF FF FF	miDefaultResourceStreamIndex
+47 41 4D 45 44 41 54 41 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 8A E4 3F 0B 00 00 00 00 40 00 00 40 00 00 00 00 00 00 00 00 00 00 00 00 31 00 00 00 00 00 00 00 00 00 00 00	macStreamName
+
+
+
+62 6E 64 32                → macMagicNumber          → "bnd2"
+05 00                      → muVersion               → 0x0005 (Version 5)
+01 00                      → muPlatform              → 0x0001 (PC)
+2F 4F 03 00                → muDebugDataOffset       → 0x00034F2F (Debug data start)
+18 01 00 00                → muResourceEntriesCount  → 0x00000118 = 280 entries
+70 00 00 00                → muResourceEntriesOffset → 0x00000070 (starts right after header)
+30 4F 00 00                → mauResourceDataOffset[0]→ 0x00004F30
+2F 4F 03 00                → mauResourceDataOffset[1]→ 0x00034F2F
+2F 4F 03 00                → mauResourceDataOffset[2]→ 0x00034F2F
+2F 4F 03 00                → mauResourceDataOffset[3]→ 0x00034F2F
+09 00 00 00                → muFlags                 → 0x00000009
+00 00 00 00 00 00 00 00    → mDefaultResourceId      → 0
+FF FF FF FF                → miDefaultResourceStreamIndex → -1 (Invalid stream)

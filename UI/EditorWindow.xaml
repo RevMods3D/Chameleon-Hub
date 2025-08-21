@@ -1,137 +1,171 @@
 ﻿<Window x:Class="Chameleon_Hub.EditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Editor" Height="625" Width="1000"
+        Title="Chameleon Hub" Height="720" Width="1280" MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#FF1E1E1E" Foreground="#FFD4D4D4"
         WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent">
-
-    <Border CornerRadius="20" Padding="0" SnapsToDevicePixels="True">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FF460046" Offset="0.1"/>
-                <GradientStop Color="#FF004A25" Offset="0.5"/>
-                <GradientStop Color="#FF00254A" Offset="1.0"/>
-            </LinearGradientBrush>
-        </Border.Background>
-
-        <Grid>
-            <!-- Left Vertical Bar -->
-            <Border Width="60" CornerRadius="20,0,0,20" VerticalAlignment="Stretch" HorizontalAlignment="Left" MouseDown="DragWindow_MouseDown" Background="#7F000000">
-                <StackPanel x:Name="Drag" Orientation="Vertical" Margin="5,10">
-                    <!-- Close Button on top -->
-                    <Button Content="×" Width="40" Height="40" Background="Transparent" Foreground="White"
-                    BorderBrush="{x:Null}" Click="CloseButton_Click"
-                    FontSize="20"
-                    Padding="0" Margin="0,0,0,10"
-                    Cursor="Hand" />
-                    <Image x:Name="Engine_Icon" Source="/Resources/Chameleon hub.png" 
-                    Width="50" Height="50" Stretch="Fill" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0">
-                        <Image.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform/>
-                                <RotateTransform Angle="0"/>
-                                <TranslateTransform X="0" Y="-15"/>
-                            </TransformGroup>
-                        </Image.RenderTransform>
-                    </Image>
-                </StackPanel>
-            </Border>
-
-            <!-- Main Content -->
-            <Grid Margin="70,30,10,10" HorizontalAlignment="Left" Width="948" VerticalAlignment="Center">
-                <!-- Add left margin to avoid overlap with vertical bar -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="95*" />
-                    <ColumnDefinition Width="221*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Left Panel: BNDL Files -->
-                <Border Background="#7F000000" Margin="0,5,0,5" CornerRadius="10" Padding="10" Width="274" HorizontalAlignment="Left" >
-                    <StackPanel>
-                        <TextBlock Text="Files" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
-
-                        <DockPanel Margin="0,0,0,10" HorizontalAlignment="Left">
-                            <TextBox x:Name="SearchBox"
-             Width="180"
-             Height="25"
-             VerticalAlignment="Center"
-             Background="#7F000000"
-             Foreground="White"
-             Margin="0,0,5,0"
-             Padding="6"
-             BorderThickness="0"
-             KeyDown="SearchBox_KeyDown" />
-                            <Button Content="🔍"
-            Width="30"
-            Click="SearchButton_Click"
-            ToolTip="Search BNDL Tree"
-            Cursor="Hand" Background="#3F888888" BorderBrush="Black"/>
-                        </DockPanel>
-
-                        <TreeView x:Name="treeBndlFiles" Background="Transparent" Foreground="White" SelectedItemChanged="TreeBndlFiles_SelectedItemChanged" Height="500"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Center Panel: Selected BNDL Info -->
-                <Border Background="#7F000000" Margin="10,5,0,5" Grid.Column="1" CornerRadius="10" Padding="10" HorizontalAlignment="Left" VerticalAlignment="Center" Width="615" >
-                    <StackPanel>
-                        <TextBlock x:Name="textBndlDatContent" Text="BNDL/DAT File Content" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
-
-                        <DockPanel Margin="0,0,0,10" HorizontalAlignment="Left">
-                            <TextBox x:Name="HexSearchBox"
-                     Width="300"
-                     Height="25"
-                     Background="#7F000000"
-                     Foreground="White"
-                     BorderThickness="0"
-                     Padding="6,2"
-                     KeyDown="HexSearchBox_KeyDown"/>
-                            <Button Content="🔍"
-                    Width="30"
-                    Click="HexSearchButton_Click"
-                    ToolTip="Search Hex/ASCII"
-                    Cursor="Hand" Background="#3FDDDDDD" BorderBrush="Black"/>
-                        </DockPanel>
-
-                        <TreeView x:Name="treeDatContents" Background="Transparent" Foreground="White" Margin="0,0,0,10"/>
-
-                        <!-- ASCII Box -->
-                        <ScrollViewer Height="490">
-                            <TextBox x:Name="textBoxAscii"
-                     Background="#7FFFFFFF"
-                     Foreground="Black"
-                     FontFamily="Consolas"
-                     FontSize="12"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto"
-                     HorizontalScrollBarVisibility="Auto"
-                     IsReadOnly="True"
-                     BorderThickness="0"/>
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
-                <TextBlock x:Name="AlignmentInfoTextBlock"
-                            FontSize="14"
-                            Foreground="LightGreen"
-                            Text="Alignment info will appear here." RenderTransformOrigin="0.5,0.5" Margin="115,280,115,280" >
-                    <TextBlock.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform X="0" Y="-300"/>
-                        </TransformGroup>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
-
-            </Grid>
-        </Grid>
-    </Border>
+        AllowsTransparency="False">
 
     <Window.Resources>
-        <RotateTransform x:Key="RotateTransform90" Angle="90" />
+        <!-- Dark ScrollBar Style -->
+        <Style TargetType="ScrollBar" x:Key="DarkScrollBarStyle">
+            <Setter Property="Background" Value="#FF3E3E42"/>
+            <Setter Property="Foreground" Value="#FFD4D4D4"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineUpCommand" Background="#FF2D2D30" BorderBrush="Transparent" BorderThickness="0" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Background="#FF575757" />
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineDownCommand" Background="#FF2D2D30" BorderBrush="Transparent" BorderThickness="0" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="#FFD4D4D4" />
+        </Style>
+
     </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+
+
+        <!-- Title + Menu Bar Container -->
+        <Grid DockPanel.Dock="Top" Height="60" Background="#FF2D2D30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <!-- Title Bar -->
+                <RowDefinition Height="30"/>
+                <!-- Menu Bar -->
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Grid Grid.Row="0" Background="#FF2D2D30" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo + Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <Image Source="/Resources/Chameleon hub.png" Width="30" Height="30" Margin="0,0,5,0"/>
+                    <TextBlock Text="Chameleon Hub" Foreground="#FFD4D4D4" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Window Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Width="40" Height="30" Content="—" Click="MinimizeButton_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="#FFD4D4D4" />
+                    <Button Width="40" Height="30" Content="▢" Click="MaximizeButton_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="#FFD4D4D4" />
+                    <Button Width="40" Height="30" Content="X" Click="CloseButton_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="#FFD4D4D4" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Menu Bar -->
+            <Grid Grid.Row="1">
+                <Menu Background="#FF2D2D30" Foreground="#FFD4D4D4" Height="30" VerticalAlignment="Top">
+                    <MenuItem Header="_File" Height="30" >
+                        <MenuItem Header="Open..." />
+                        <MenuItem Header="Exit" Click="CloseButton_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="_Options">
+                        <MenuItem Header="Settings" />
+                    </MenuItem>
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="About" />
+                    </MenuItem>
+                </Menu>
+            </Grid>
+        </Grid>
+
+        <!-- Tabs for Opened Files (full width, below menu) -->
+        <TabControl x:Name="FileTabControl" DockPanel.Dock="Top"
+                    Background="#FF252526" Foreground="#FFD4D4D4"
+                    BorderBrush="#FF3E3E42" BorderThickness="1"
+                    Height="30" />
+
+        <!-- Main Grid with 4 panes -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="5*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="200" />
+            </Grid.RowDefinitions>
+
+            <!-- Left Top: Files TreeView -->
+            <GroupBox Header="Files" Grid.Row="0" Grid.Column="0" Margin="5" Padding="5"
+                      Background="#FF252526" Foreground="#FFD4D4D4"
+                      BorderBrush="#FF3E3E42" BorderThickness="1">
+                <Border Margin="5" Background="#FF1E1E1E" BorderThickness="1" BorderBrush="#FF3E3E42">
+                    <TreeView x:Name="treeBndlFiles" Background="#FF1E1E1E" Foreground="#FFD4D4D4" BorderThickness="0" />
+                </Border>
+
+            </GroupBox>
+
+            <!-- Left Bottom: File Metadata -->
+            <GroupBox Header="File Metadata" Grid.Row="2" Grid.Column="0" Margin="5"
+                      Background="#FF252526" Foreground="#FFD4D4D4"
+                      BorderBrush="#FF3E3E42" BorderThickness="1">
+                <StackPanel Margin="5">
+                    <TextBlock Text="ID: 0x1234" />
+                    <TextBlock Text="Type: VEH" />
+                    <TextBlock Text="Size: 2048 bytes" />
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Vertical Splitter -->
+            <GridSplitter Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                          Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                          Background="#FF3E3E42" ShowsPreview="True" />
+
+            <!-- Right Top: Converted Info -->
+            <GroupBox Header="Converted Info" Grid.Row="0" Grid.Column="2" Margin="5"
+              Background="#FF252526" Foreground="#FFD4D4D4"
+              BorderBrush="#FF3E3E42" BorderThickness="1">
+                <ScrollViewer Margin="5"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      Background="#FF1E1E1E">
+                    <TextBlock Text="Text Converted from Binary" TextWrapping="Wrap" Foreground="#FFD4D4D4" />
+                </ScrollViewer>
+            </GroupBox>
+
+            <!-- Horizontal Splitter -->
+            <GridSplitter Grid.Row="1" Grid.Column="2" Height="2"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                          Background="#FF3E3E42" ShowsPreview="True" />
+
+            <!-- Right Bottom: Hex Viewer (removed TabControl, since tabs are now on top) -->
+            <GroupBox Header="Hex Viewer" Grid.Row="2" Grid.Column="2" Margin="5"
+                      Background="#FF252526" Foreground="#FFD4D4D4"
+                      BorderBrush="#FF3E3E42" BorderThickness="1">
+                <TextBlock Text="Binary Code" TextWrapping="Wrap" Foreground="#FFD4D4D4" />
+                <!-- This stays empty or can have a placeholder, as tabs now control hex editors -->
+            </GroupBox>
+
+            <!-- Horizontal Splitter Left Bottom -->
+            <GridSplitter Grid.Row="1" Grid.Column="0" Height="2"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                          Background="#FF3E3E42" ShowsPreview="True" />
+
+        </Grid>
+    </DockPanel>
 </Window>

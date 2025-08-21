@@ -13,8 +13,6 @@ namespace Chameleon_Hub.Core
         }
 
         public ObservableCollection<GameFolder> SubFolders { get; set; } = new();
-        public ObservableCollection<BndlFile> BndlFiles { get; set; } = new();
-
         public GameFolder(string name)
         {
             Name = name;

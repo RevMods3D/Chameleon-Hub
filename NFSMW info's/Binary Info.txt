@@ -1,0 +1,13 @@
+
+62 6E 64 32 					macMagicNumber			bnd2
+05 00 							muVersion				Version 5
+01 00 							muPlatform				PC
+01 61 3E 00 					muDebugDataOffset		
+2A 03 00 00						muResourceEntriesCount
+70 00 00 00 					muResourceEntriesOffset
+40 E4 00 00 AF 86 26 00 01 61	mauResourceDataOffset
+09 00 00 00						muFlags
+00 00 00 00 00 00 00 00			mDefaultResourceId
+FF FF FF FF						miDefaultResourceStreamIndex
+00 00 00 00						macStreamName
+

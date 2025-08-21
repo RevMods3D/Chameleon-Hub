@@ -11,7 +11,8 @@ namespace Chameleon_Hub
 {
 public class NFSMWBNDL
 {
-    public string FilePath { get; private set; }
+        private static readonly HashSet<int> uniqueFlags = new();
+        public string FilePath { get; private set; }
     public class BundleEntry
     {
         public string Name { get; set; }
@@ -27,8 +28,23 @@ public class NFSMWBNDL
         public byte[] Data1 { get; set; }
         public byte[] Data2 { get; set; }
 
+            public static bool IsBndlFile(byte[] data)
+            {
+                if (data == null || data.Length < 4)
+                    return false;
 
-        public List<Tuple<string, byte[]>> GetContainedFiles()
+                // Adjust these bytes to match your real .bndl signature
+                byte[] bndlSignature = new byte[] { 0x42, 0x4E, 0x44, 0x4C }; // 'B','N','D','L'
+
+                for (int i = 0; i < bndlSignature.Length; i++)
+                {
+                    if (data[i] != bndlSignature[i])
+                        return false;
+                }
+                return true;
+            }
+
+            public List<Tuple<string, byte[]>> GetContainedFiles()
         {
             var files = new List<Tuple<string, byte[]>>();
             string baseName = Name;
@@ -73,8 +89,7 @@ public class NFSMWBNDL
         }
     }
 
-
-    public List<BundleEntry> Entries { get; private set; } = new List<BundleEntry>();
+        public List<BundleEntry> Entries { get; private set; } = new List<BundleEntry>();
     public byte[] IDsTable { get; private set; }
     public byte[] ResourceStringTable { get; private set; }
 
@@ -178,29 +193,40 @@ public class NFSMWBNDL
         }
     }
 
-    private byte[] ReadDataBlock(BinaryReader br, int compressedSize)
-    {
-        if (compressedSize <= 0)
-            return null;
-
-        switch (_compressionFlag)
+        private byte[] ReadDataBlock(BinaryReader br, int compressedSize)
         {
-            case 2: // uncompressed
-                return br.ReadBytes(compressedSize);
+            if (compressedSize <= 0)
+                return null;
 
-            case 1: // zlib compressed
-                var compressedData = br.ReadBytes(compressedSize);
-                return DecompressData(compressedData);
+            // Log unique flags
+            if (!uniqueFlags.Contains(_compressionFlag))
+            {
+                uniqueFlags.Add(_compressionFlag);
+                Console.WriteLine($"Discovered new compression flag: {_compressionFlag:X2}");
+            }
 
-            case 9: // unhandled compression - fallback
-                return br.ReadBytes(compressedSize);
+            switch (_compressionFlag)
+            {
+                case 2: // uncompressed
+                    return br.ReadBytes(compressedSize);
 
-            default:
-                throw new NotSupportedException($"Unsupported compression flag: {_compressionFlag}");
+                case 1: // zlib compressed
+                    var compressedData = br.ReadBytes(compressedSize);
+                    return DecompressData(compressedData);
+
+                case 9: // unhandled compression - fallback
+                    return br.ReadBytes(compressedSize);
+
+                default:
+                    // Optionally skip unsupported files instead of throwing
+                    Console.WriteLine($"Skipping unsupported compression flag: {_compressionFlag:X2}");
+                    return null;
+                    // OR keep this to crash intentionally:
+                    // throw new NotSupportedException($"Unsupported compression flag: {_compressionFlag}");
+            }
         }
-    }
 
-    private byte[] DecompressData(byte[] compressedData)
+        private byte[] DecompressData(byte[] compressedData)
     {
         try
         {

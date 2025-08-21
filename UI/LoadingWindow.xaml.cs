@@ -41,7 +41,7 @@ namespace Chameleon_Hub
         {
             Dispatcher.Invoke(() =>
             {
-                labelStatus.Content = status;
+                labelStatus.Text = status;
             });
         }
 
